@@ -58,7 +58,7 @@ const LiveChartImage: React.FC = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setImgSrcs(generateImgSrcs(indicator, pair));
-    }, 5000);
+    }, 60000);
     return () => clearInterval(interval);
   }, [indicator, pair]);
 
