@@ -42,10 +42,7 @@ const SidebarSelector: React.FC<SidebarSelectorProps> = ({
         {indicators.map((ind) => (
           <button
             key={ind}
-            onClick={() => {
-              setIndicator(ind);
-              onClose();
-            }}
+            onClick={() => setIndicator(ind)}
             className={`px-3 py-1 rounded border border-white
               ${
                 indicator === ind
@@ -63,10 +60,7 @@ const SidebarSelector: React.FC<SidebarSelectorProps> = ({
         {pairs.map((pr) => (
           <button
             key={pr}
-            onClick={() => {
-              setPair(pr);
-              onClose();
-            }}
+            onClick={() => setPair(pr)}
             className={`px-3 py-1 rounded border border-white whitespace-nowrap
               ${
                 pair === pr
