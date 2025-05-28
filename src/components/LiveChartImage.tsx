@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import SidebarSelector from "./SidebarSelector"; // pastikan path sesuai
+import { useTheme } from "../themeContext";
 
 const indicators = ["OB", "HS", "HP", "WW"];
 const pairs = [
@@ -42,7 +43,7 @@ const LiveChartImage: React.FC = () => {
   const [pair, setPair] = useState<string>(pairs[0]);
   const [imgSrcs, setImgSrcs] = useState<string[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
-
+  const { theme, toggle } = useTheme();
   // Generate all image URLs for selected indicator & pair (with cache buster)
   const generateImgSrcs = (indicator: string, pair: string) =>
     timeframes.map(
@@ -63,10 +64,28 @@ const LiveChartImage: React.FC = () => {
   }, [indicator, pair]);
 
   return (
-    <div className="flex flex-col items-center gap-6 p-4 relative">
+    <div
+      className={`flex flex-col min-h-screen items-center gap-6 p-4 relative transition-colors duration-300
+  ${theme === "dark" ? "bg-gray-950" : "bg-gray-100"}
+`}
+    >
       {/* Sidebar Toggle Button */}
       <button
-        className="fixed top-4 left-4 z-50 p-2 bg-gray-900 border border-white rounded shadow-lg text-white"
+        className="fixed top-4 right-4 z-50 p-2 rounded shadow-lg border border-gray-400
+        bg-white dark:bg-gray-900 dark:text-white"
+        onClick={toggle}
+        aria-label="Toggle Theme"
+      >
+        {theme === "light" ? "☀️ Light" : "🌙 Dark"}
+      </button>
+      <button
+        className={`
+    fixed top-4 left-4 z-50 p-2 rounded shadow-lg border
+    bg-white text-gray-900 border-gray-300
+    dark:bg-gray-900 dark:text-white dark:border-gray-600
+    hover:bg-gray-200 dark:hover:bg-gray-800
+    transition
+  `}
         onClick={() => setSidebarOpen(true)}
         aria-label="Open Sidebar"
       >
@@ -99,12 +118,12 @@ const LiveChartImage: React.FC = () => {
         {timeframes.map((tf, idx) => (
           <div
             key={tf.value}
-            className="bg-gray-900 p-1 rounded-lg flex flex-col items-center shadow-lg border border-white"
+            className="bg-white dark:bg-gray-900 p-1 rounded-lg flex flex-col items-center shadow-lg border border-gray-300 dark:border-white"
           >
-            <div className="text-white font-bold mb-2">
+            <div className="text-black dark:text-white font-bold mb-2">
               {tf.label} ${pair}
             </div>
-            <div className="w-full aspect-[3/2] bg-[#222] flex items-center justify-center rounded">
+            <div className="w-full aspect-[3/2] bg-gray-100 dark:bg-[#222] flex items-center justify-center rounded">
               <img
                 src={imgSrcs[idx]}
                 alt={`${indicator} ${pair} ${tf.label}`}

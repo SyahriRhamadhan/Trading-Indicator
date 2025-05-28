@@ -20,14 +20,17 @@ const SidebarSelector: React.FC<SidebarSelectorProps> = ({
   onClose,
 }) => {
   return (
-    <div className="fixed top-0 left-0 w-80 max-w-full h-full z-50 bg-gray-900 border-r border-white shadow-lg flex flex-col p-6 gap-4 transition-all">
+    <div
+      className="fixed inset-0 z-50 min-h-screen w-80 max-w-full
+        bg-white dark:bg-gray-900 border-r border-gray-300 dark:border-white
+        shadow-lg flex flex-col p-6 gap-4 transition-all overflow-y-auto"
+    >
       {/* Close Button */}
       <button
-        className="self-end mb-6 text-white"
+        className="self-end mb-6 text-black dark:text-white"
         onClick={onClose}
         aria-label="Close Sidebar"
       >
-        {/* Close Icon */}
         <svg width={28} height={28} fill="none" stroke="currentColor">
           <path
             strokeLinecap="round"
@@ -43,11 +46,11 @@ const SidebarSelector: React.FC<SidebarSelectorProps> = ({
           <button
             key={ind}
             onClick={() => setIndicator(ind)}
-            className={`px-3 py-1 rounded border border-white
+            className={`px-3 py-1 rounded border border-gray-300 dark:border-white
               ${
                 indicator === ind
-                  ? "bg-white text-black font-bold"
-                  : "bg-transparent text-white"
+                  ? "bg-gray-900 text-white dark:bg-white dark:text-black font-bold"
+                  : "bg-white text-black dark:bg-transparent dark:text-white"
               }
               transition`}
           >
@@ -55,17 +58,17 @@ const SidebarSelector: React.FC<SidebarSelectorProps> = ({
           </button>
         ))}
       </div>
-      {/* Pair buttons: Grid, 2 baris */}
+      {/* Pair buttons */}
       <div className="grid grid-cols-3 gap-2 w-full">
         {pairs.map((pr) => (
           <button
             key={pr}
             onClick={() => setPair(pr)}
-            className={`px-3 py-1 rounded border border-white whitespace-nowrap
+            className={`px-3 py-1 rounded border border-gray-300 dark:border-white whitespace-nowrap
               ${
                 pair === pr
-                  ? "bg-white text-black font-bold"
-                  : "bg-transparent text-white"
+                  ? "bg-gray-900 text-white dark:bg-white dark:text-black font-bold"
+                  : "bg-white text-black dark:bg-transparent dark:text-white"
               }
               transition`}
           >
