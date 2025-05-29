@@ -1,7 +1,17 @@
 version: "3"
 services:
-  web:
-    build: .
+  fe:
+    build:
+      context: ./fe
+      dockerfile: Dockerfile
     ports:
       - "8081:80"
+    restart: unless-stopped
+
+  be:
+    build:
+      context: ./be
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
     restart: unless-stopped
