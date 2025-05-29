@@ -2,7 +2,11 @@ import React, { useEffect, useState } from "react";
 import SidebarSelector from "./SidebarSelector";
 import { useTheme } from "../themeContext";
 
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5001";
+const API_BASE =
+  import.meta.env.VITE_API_BASE ||
+  window.location.origin.replace(":8081", ":5001"); // FE di 8081, BE di 5001
+// Jika beda, bisa set di .env VITE_API_BASE
+
 const indicators = ["OB", "HS", "HP", "WW"];
 const pairs = [
   "XAUUSD",
@@ -47,30 +51,28 @@ const LiveChartImage: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { theme, toggle } = useTheme();
 
+  // Update images on change
   useEffect(() => {
-    async function updateImgs() {
-      // Pakai overlay jika dipilih
-      if (overlayIndicator) {
-        const urls = timeframes.map((tf) => {
+    if (overlayIndicator) {
+      setImgSrcs(
+        timeframes.map((tf) => {
           const bg = getImgUrl(indicator, pair, tf.value);
           const fg = getImgUrl(overlayIndicator, pair, tf.value);
           return `${API_BASE}/overlay?bg=${encodeURIComponent(
             bg
-          )}&fg=${encodeURIComponent(fg)}`;
-        });
-        setImgSrcs(urls);
-      } else {
-        setImgSrcs(
-          timeframes.map(
-            (tf) => getImgUrl(indicator, pair, tf.value) + "?t=" + Date.now()
-          )
-        );
-      }
+          )}&fg=${encodeURIComponent(fg)}&t=${Date.now()}`;
+        })
+      );
+    } else {
+      setImgSrcs(
+        timeframes.map(
+          (tf) => getImgUrl(indicator, pair, tf.value) + "?t=" + Date.now()
+        )
+      );
     }
-    updateImgs();
   }, [indicator, pair, overlayIndicator]);
 
-  // Optional: auto refresh per 60 detik
+  // Auto-refresh every 60s
   useEffect(() => {
     const interval = setInterval(() => {
       if (overlayIndicator) {

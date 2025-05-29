@@ -4,9 +4,10 @@ import sharp from "sharp";
 import cors from "cors";
 
 const app = express();
-const PORT = 5001;
+const PORT = process.env.PORT || 5001;
 app.use(cors());
 
+// Overlay endpoint: bg=background, fg=overlay
 app.get("/overlay", async (req, res) => {
   try {
     const { bg, fg } = req.query;
@@ -15,12 +16,12 @@ app.get("/overlay", async (req, res) => {
         .status(400)
         .send("Query bg (background) dan fg (overlay) wajib");
     }
-    // Download kedua gambar
+    // Download images
     const [bgBuf, fgBuf] = await Promise.all([
       fetch(bg).then((r) => r.buffer()),
       fetch(fg).then((r) => r.buffer()),
     ]);
-    // Proses overlay: warna putih fg jadi transparan
+    // Putihkan overlay (fg) jadi transparan
     const fgPng = await sharp(fgBuf).png().toBuffer();
     const { data, info } = await sharp(fgPng)
       .ensureAlpha()
@@ -33,7 +34,7 @@ app.get("/overlay", async (req, res) => {
     const fgWithAlpha = await sharp(data, { raw: { ...info, channels: 4 } })
       .png()
       .toBuffer();
-    // Gabungkan background & overlay
+    // Gabungkan background + overlay
     const final = await sharp(bgBuf)
       .composite([{ input: fgWithAlpha }])
       .png()
@@ -47,5 +48,5 @@ app.get("/overlay", async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Overlay server running at http://localhost:${PORT}`);
+  console.log(`Overlay server running at http://0.0.0.0:${PORT}`);
 });

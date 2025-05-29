@@ -39,35 +39,35 @@ const SidebarSelector: React.FC<SidebarSelectorProps> = ({
         />
       </svg>
     </button>
-    {/* Indicator */}
+    {/* Indicator buttons */}
     <div className="flex gap-2 mb-4">
       {indicators.map((ind) => (
         <button
           key={ind}
           onClick={() => {
             setIndicator(ind);
-            setOverlayIndicator(null);
+            setOverlayIndicator(null); // Reset overlay saat ganti indikator utama
           }}
-          className={`px-3 py-1 rounded border border-gray-300 dark:border-white ${
-            indicator === ind
-              ? "bg-gray-900 text-white dark:bg-white dark:text-black font-bold"
-              : "bg-white text-black dark:bg-transparent dark:text-white"
-          } transition`}
+          className={`px-3 py-1 rounded border border-gray-300 dark:border-white
+            ${
+              indicator === ind
+                ? "bg-gray-900 text-white dark:bg-white dark:text-black font-bold"
+                : "bg-white text-black dark:bg-transparent dark:text-white"
+            }
+            transition`}
         >
           {ind}
         </button>
       ))}
     </div>
-    {/* Overlay selector */}
+    {/* Overlay Selector */}
     <div className="mb-4">
       <label className="block text-sm text-gray-700 dark:text-gray-300 font-medium mb-1">
         Timpa dengan indikator lain:
       </label>
       <select
         value={overlayIndicator || ""}
-        onChange={(e) =>
-          setOverlayIndicator(e.target.value ? e.target.value : null)
-        }
+        onChange={(e) => setOverlayIndicator(e.target.value || null)}
         className="w-full px-2 py-1 border rounded border-gray-300 dark:border-white bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
       >
         <option value="">(Tidak ada)</option>
@@ -86,11 +86,13 @@ const SidebarSelector: React.FC<SidebarSelectorProps> = ({
         <button
           key={pr}
           onClick={() => setPair(pr)}
-          className={`px-3 py-1 rounded border border-gray-300 dark:border-white whitespace-nowrap ${
-            pair === pr
-              ? "bg-gray-900 text-white dark:bg-white dark:text-black font-bold"
-              : "bg-white text-black dark:bg-transparent dark:text-white"
-          } transition`}
+          className={`px-3 py-1 rounded border border-gray-300 dark:border-white whitespace-nowrap
+            ${
+              pair === pr
+                ? "bg-gray-900 text-white dark:bg-white dark:text-black font-bold"
+                : "bg-white text-black dark:bg-transparent dark:text-white"
+            }
+            transition`}
         >
           {pr}
         </button>
