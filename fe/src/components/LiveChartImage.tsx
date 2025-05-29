@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import SidebarSelector from "./SidebarSelector"; // pastikan path sesuai
+import SidebarSelector from "./SidebarSelector";
 import { useTheme } from "../themeContext";
 
+const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5001";
 const indicators = ["OB", "HS", "HP", "WW"];
 const pairs = [
   "XAUUSD",
@@ -34,62 +35,84 @@ const timeframes = [
   { label: "1 Menit", value: 1 },
 ];
 
-function getImageUrl(indicator: string, pair: string, timeframe: number) {
-  return `http://www.4africa.net/4africa.net/meta/${indicator}_${pair}_${timeframe}.gif`;
+function getImgUrl(indicator: string, pair: string, tf: number) {
+  return `http://www.4africa.net/4africa.net/meta/${indicator}_${pair}_${tf}.gif`;
 }
 
 const LiveChartImage: React.FC = () => {
-  const [indicator, setIndicator] = useState<string>(indicators[0]);
-  const [pair, setPair] = useState<string>(pairs[0]);
+  const [pair, setPair] = useState(pairs[0]);
+  const [indicator, setIndicator] = useState(indicators[0]);
+  const [overlayIndicator, setOverlayIndicator] = useState<string | null>(null);
   const [imgSrcs, setImgSrcs] = useState<string[]>([]);
-  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const { theme, toggle } = useTheme();
-  // Generate all image URLs for selected indicator & pair (with cache buster)
-  const generateImgSrcs = (indicator: string, pair: string) =>
-    timeframes.map(
-      (tf) => getImageUrl(indicator, pair, tf.value) + "?t=" + Date.now()
-    );
 
-  // Update all image URLs when indicator or pair changes
   useEffect(() => {
-    setImgSrcs(generateImgSrcs(indicator, pair));
-  }, [indicator, pair]);
+    async function updateImgs() {
+      // Pakai overlay jika dipilih
+      if (overlayIndicator) {
+        const urls = timeframes.map((tf) => {
+          const bg = getImgUrl(indicator, pair, tf.value);
+          const fg = getImgUrl(overlayIndicator, pair, tf.value);
+          return `${API_BASE}/overlay?bg=${encodeURIComponent(
+            bg
+          )}&fg=${encodeURIComponent(fg)}`;
+        });
+        setImgSrcs(urls);
+      } else {
+        setImgSrcs(
+          timeframes.map(
+            (tf) => getImgUrl(indicator, pair, tf.value) + "?t=" + Date.now()
+          )
+        );
+      }
+    }
+    updateImgs();
+  }, [indicator, pair, overlayIndicator]);
 
-  // Auto-refresh all images every 5 seconds
+  // Optional: auto refresh per 60 detik
   useEffect(() => {
     const interval = setInterval(() => {
-      setImgSrcs(generateImgSrcs(indicator, pair));
+      if (overlayIndicator) {
+        setImgSrcs(
+          timeframes.map((tf) => {
+            const bg = getImgUrl(indicator, pair, tf.value);
+            const fg = getImgUrl(overlayIndicator, pair, tf.value);
+            return `${API_BASE}/overlay?bg=${encodeURIComponent(
+              bg
+            )}&fg=${encodeURIComponent(fg)}&t=${Date.now()}`;
+          })
+        );
+      } else {
+        setImgSrcs(
+          timeframes.map(
+            (tf) => getImgUrl(indicator, pair, tf.value) + "?t=" + Date.now()
+          )
+        );
+      }
     }, 60000);
     return () => clearInterval(interval);
-  }, [indicator, pair]);
+  }, [indicator, pair, overlayIndicator]);
 
   return (
     <div
-      className={`flex flex-col min-h-screen items-center gap-6 p-4 relative transition-colors duration-300
-  ${theme === "dark" ? "bg-gray-950" : "bg-gray-100"}
-`}
+      className={`flex flex-col min-h-screen items-center gap-6 p-4 relative transition-colors duration-300 ${
+        theme === "dark" ? "bg-gray-950" : "bg-gray-100"
+      }`}
     >
-      {/* Sidebar Toggle Button */}
+      {/* Theme & Sidebar */}
       <button
-        className="fixed top-4 right-4 z-50 p-2 rounded shadow-lg border border-gray-400
-        bg-white dark:bg-gray-900 dark:text-white"
+        className="fixed top-4 right-4 z-50 p-2 rounded shadow-lg border border-gray-400 bg-white dark:bg-gray-900 dark:text-white"
         onClick={toggle}
         aria-label="Toggle Theme"
       >
         {theme === "light" ? "☀️ Light" : "🌙 Dark"}
       </button>
       <button
-        className={`
-    fixed top-4 left-4 z-50 p-2 rounded shadow-lg border
-    bg-white text-gray-900 border-gray-300
-    dark:bg-gray-900 dark:text-white dark:border-gray-600
-    hover:bg-gray-200 dark:hover:bg-gray-800
-    transition
-  `}
+        className="fixed top-4 left-4 z-50 p-2 rounded shadow-lg border bg-white text-gray-900 border-gray-300 dark:bg-gray-900 dark:text-white dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-800 transition"
         onClick={() => setSidebarOpen(true)}
         aria-label="Open Sidebar"
       >
-        {/* Hamburger Icon */}
         <svg width={28} height={28} fill="none" stroke="currentColor">
           <path
             strokeLinecap="round"
@@ -99,21 +122,20 @@ const LiveChartImage: React.FC = () => {
           />
         </svg>
       </button>
-
-      {/* Sidebar as a separate component */}
       {sidebarOpen && (
         <SidebarSelector
           indicators={indicators}
           indicator={indicator}
           setIndicator={setIndicator}
+          overlayIndicator={overlayIndicator}
+          setOverlayIndicator={setOverlayIndicator}
           pairs={pairs}
           pair={pair}
           setPair={setPair}
           onClose={() => setSidebarOpen(false)}
         />
       )}
-
-      {/* Grid semua timeframe */}
+      {/* Timeframes Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full mt-4">
         {timeframes.map((tf, idx) => (
           <div
