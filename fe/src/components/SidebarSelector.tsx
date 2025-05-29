@@ -12,6 +12,8 @@ type SidebarSelectorProps = {
   onClose: () => void;
 };
 
+const activeBorder = "border-2 border-black dark:border-white"; // hitam di light, putih di dark
+
 const SidebarSelector: React.FC<SidebarSelectorProps> = ({
   indicators,
   indicator,
@@ -60,25 +62,43 @@ const SidebarSelector: React.FC<SidebarSelectorProps> = ({
         </button>
       ))}
     </div>
-    {/* Overlay Selector */}
     <div className="mb-4">
       <label className="block text-sm text-gray-700 dark:text-gray-300 font-medium mb-1">
         Timpa dengan indikator lain:
       </label>
-      <select
-        value={overlayIndicator || ""}
-        onChange={(e) => setOverlayIndicator(e.target.value || null)}
-        className="w-full px-2 py-1 border rounded border-gray-300 dark:border-white bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-      >
-        <option value="">(Tidak ada)</option>
+      <div className="flex flex-wrap gap-2">
+        <button
+          onClick={() => setOverlayIndicator(null)}
+          className={`px-3 py-1 rounded border border-gray-300 dark:border-white
+            ${
+              overlayIndicator === null
+                ? "bg-gray-900 text-white dark:bg-white dark:text-black font-bold"
+                : "bg-white text-black dark:bg-transparent dark:text-white"
+            }
+            transition
+            `}
+        >
+          (Tidak ada)
+        </button>
         {indicators
           .filter((ind) => ind !== indicator)
           .map((ind) => (
-            <option key={ind} value={ind}>
+            <button
+              key={ind}
+              onClick={() => setOverlayIndicator(ind)}
+              className={`px-3 py-1 rounded transition font-semibold
+                ${
+                  overlayIndicator === ind
+                    ? activeBorder
+                    : "border border-gray-300 dark:border-white"
+                }
+                bg-white dark:bg-transparent text-black dark:text-white
+              `}
+            >
               {ind}
-            </option>
+            </button>
           ))}
-      </select>
+      </div>
     </div>
     {/* Pair buttons */}
     <div className="grid grid-cols-3 gap-2 w-full">
